@@ -1,52 +1,38 @@
-        
-class Segtree {
-
+struct SegmentTree {
 vector<int> t;
-public:
-
-    /*
-        follow 1-based index
-        tl - tr -> array bound
-    */
-
-    Segtree(int N) {
-        t.resize(4 * N + 1);
+int n;
+  SegmentTree(int n_) {
+    n = n_;
+    t.assign(4 * n, 0);
+  }
+  void pointUpdate(int v, int l, int r, int pos, int val) {
+    if (l == r) {
+      t[v] = val;
     }
-
-    void build (int v, int tl, int tr, vector<int> &a) {
-        if (tl == tr) {
-            t[v] = a[tl];
-        } else {
-            int tm = (tl + tr) / 2;
-            build (v * 2 + 1, tl, tm, a);
-            build (v * 2 + 2, tm + 1, tr, a);
-            t[v] = t[v * 2 + 1] + t[v * 2 + 2];
-        }
+    else {
+      int m = (l + r) / 2;
+      if (pos <= m) {
+        pointUpdate(v * 2, l, m, pos, val);
+      }
+      else {
+        pointUpdate(v * 2 + 1, m + 1, r, pos, val);
+      }
     }
-
-    void update(int v, int tl, int tr, int pos, int new_val) {
-        if (tl == tr) {
-            t[v] = new_val;
-        } else {
-            int tm = (tl + tr) / 2;
-            if (pos <= tm)
-                update(v * 2 + 1, tl, tm, pos, new_val);
-            else
-                update(v * 2 + 2, tm + 1, tr, pos, new_val);
-            t[v] = t[v * 2 + 1] + t[v * 2 + 2];
-        }
+  }
+  void pointUpdate(int pos, int val) {
+    pointUpdate(1, 0, n - 1, pos, val);
+  }
+  int query(int v, int l, int r, int ql, int qr) {
+    if (qr < l || ql > r) {
+      return 0LL;
     }
-
-    int sum(int v, int tl, int tr, int l, int r) {
-        if (l > r) 
-            return 0;
-        if (l == tl && r == tr) {
-            return t[v];
-        }
-        int tm = (tl + tr) / 2;
-        int left = sum(v * 2 + 1, tl, tm, l, min(r, tm));
-        int right = sum(v * 2 + 2, tm + 1, tr, max(l, tm+1), r);
-        return left + right;
+    if (ql <= l && r <= qr) {
+      return t[v];
     }
-    
+    int m = (l + r) / 2;
+    return query(v * 2, l, m, ql, qr) + query(v * 2 + 1, m + 1, r, ql, qr);
+  }
+  int query(int l, int r) {
+    return query(1, 0, n - 1, l, r);
+  }
 };
