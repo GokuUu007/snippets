@@ -1,28 +1,24 @@
-class DSU {
-vector<int> par, sz;
-public:
+class dsu {
+ public:
+  vector<int> p;
+  int n;
 
-    DSU (int N) {
-        par.resize(N + 1);
-        sz.resize(N + 1, 1);
-        iota(all(par), 0);
-    }
-    
+  dsu(int _n) : n(_n) {
+    p.resize(n);
+    iota(p.begin(), p.end(), 0);
+  }
 
-    int find(int Node) {
-        //Union by Size 
-        if(par[Node] == Node) return Node;
-        return par[Node] = find(par[Node]);
+  inline int get(int x) {
+    return (x == p[x] ? x : (p[x] = get(p[x])));
+  }
+
+  inline bool unite(int x, int y) {
+    x = get(x);
+    y = get(y);
+    if (x != y) {
+      p[x] = y;
+      return true;
     }
-    
-    void Union (int A, int B) {
-        A = find(A);
-        B = find(B);
-        if(A != B) {
-            if(sz[A] < sz[B]) swap(A,B);
-            par[B] = A;
-            sz[A] += sz[B];
-        }
-    }   
-    
+    return false;
+  }
 };
